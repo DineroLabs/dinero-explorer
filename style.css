@@ -196,7 +196,7 @@ tr:hover td { background: var(--bg3); }
 /* ── Network snapshot ── */
 .network-panel {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
   margin: -12px 0 32px;
 }

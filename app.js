@@ -377,7 +377,7 @@ async function loadHome(silent = false) {
   const blocks = blockResults.map(r => (r.status === 'fulfilled' ? r.value : null));
 
   const updatedAt = Math.floor(Date.now() / 1000);
-  const homeHtml = `${statsBar(info, mining, blocks[0], updatedAt)}${networkPanel(network, mempool)}${latestBlocksTable(blocks)}`;
+  const homeHtml = `${statsBar(info, mining, blocks[0], updatedAt, network)}${networkPanel(network, mempool)}${latestBlocksTable(blocks)}`;
 
   if (!silent) {
     app.innerHTML = `<div class="container">${homeHtml}</div>`;
@@ -386,13 +386,13 @@ async function loadHome(silent = false) {
     const statsEl = app.querySelector('.stats-grid');
     const networkEl = app.querySelector('.network-panel');
     const tableEl = app.querySelector('tbody');
-    if (statsEl) statsEl.outerHTML = statsBar(info, mining, blocks[0], updatedAt);
+    if (statsEl) statsEl.outerHTML = statsBar(info, mining, blocks[0], updatedAt, network);
     if (networkEl) networkEl.outerHTML = networkPanel(network, mempool);
     if (tableEl) tableEl.innerHTML = blocks.map(blockRow).join('');
   }
 }
 
-function statsBar(info, mining, tipBlock, updatedAt) {
+function statsBar(info, mining, tipBlock, updatedAt, network) {
   const hashrate = mining.networkhashps ?? mining.hashespersec ?? info.networkhashps ?? null;
   const nbits = tipBlock?.bits ?? mining.nbits ?? mining.bits ?? info.nbits ?? null;
   const health = nodeHealth(info, tipBlock, updatedAt);
@@ -427,6 +427,11 @@ function statsBar(info, mining, tipBlock, updatedAt) {
       <div class="stat-value">${supply}</div>
       <div class="stat-sub">DIN circulating</div>
     </div>
+    <div class="stat-card">
+      <div class="stat-label">Public Port</div>
+      <div class="stat-value">${network?.listen_port ?? '—'}</div>
+      <div class="stat-sub">port mapping: ${escapeHtml(network?.port_mapping?.message ?? 'not requested')}</div>
+    </div>
   </div>`;
 }
 
@@ -457,11 +462,6 @@ function networkPanel(network, mempool) {
         <span>Outbound</span><strong>${outbound.toLocaleString()}</strong>
         <span>Listen</span><strong>${listen ? 'yes' : 'no'}</strong>
       </div>
-    </div>
-    <div class="mini-card">
-      <div class="mini-label">Public Port</div>
-      <div class="mini-value">${network?.listen_port ?? '—'}</div>
-      <div class="mini-sub">port mapping: ${escapeHtml(network?.port_mapping?.mode ?? 'unknown')} / ${escapeHtml(network?.port_mapping?.message ?? '—')}</div>
     </div>
     <div class="mini-card">
       <div class="mini-label">Mempool</div>
